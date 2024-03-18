@@ -66,19 +66,17 @@ public class ModbusClientTCP
         modbusClient.WriteSingleRegister(address, value);
         return 0;
     }
-
-    // Read a floating-point value from the Modbus TCP server
     public float ReadFloat(int address)
     {
         int[] registerValues = modbusClient.ReadInputRegisters(address, 2);
         byte[] bytes = new byte[4];
-        bytes[3] = (byte)(registerValues[1] & 0xFF);
-        bytes[2] = (byte)((registerValues[1] >> 8) & 0xFF);
-        bytes[1] = (byte)(registerValues[0] & 0xFF);
-        bytes[0] = (byte)((registerValues[0] >> 8) & 0xFF);
+        bytes[0] = (byte)(registerValues[0] & 0xFF);
+        bytes[1] = (byte)((registerValues[0] >> 8) & 0xFF);
+        bytes[2] = (byte)(registerValues[1] & 0xFF);
+        bytes[3] = (byte)((registerValues[1] >> 8) & 0xFF);
+
         return BitConverter.ToSingle(bytes, 0);
     }
-
     // Write a floating-point value to the Modbus TCP server
     public int WriteFloat(int address, float value)
     {

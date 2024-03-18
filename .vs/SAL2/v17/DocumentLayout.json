@@ -3,6 +3,17 @@
   "WorkspaceRootPath": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|c:\\users\\cansincanberi\\source\\repos\\sal2\\modbusclienttcp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|solutionrelative:modbusclienttcp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\cansincanberi\\AppData\\Local\\Temp\\.vsdbgsrc\\9d0befca7a43fe4612b645a6c535771b20cf94f7281a7cb9cfa72d2de05ac21b\\ModbusClient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|c:\\users\\cansincanberi\\source\\repos\\sal2\\athks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|solutionrelative:athks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|c:\\users\\cansincanberi\\source\\repos\\sal2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4541EF19-953D-4C23-9433-03676495F6F3}|SAL2.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -13,20 +24,59 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedHeight": 169,
-          "SelectedChildIndex": 0,
+          "DockedHeight": 200,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "ModbusClient.cs",
+              "DocumentMoniker": "C:\\Users\\cansincanberi\\AppData\\Local\\Temp\\.vsdbgsrc\\9d0befca7a43fe4612b645a6c535771b20cf94f7281a7cb9cfa72d2de05ac21b\\ModbusClient.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\9d0befca7a43fe4612b645a6c535771b20cf94f7281a7cb9cfa72d2de05ac21b\\ModbusClient.cs",
+              "ToolTip": "C:\\Users\\cansincanberi\\AppData\\Local\\Temp\\.vsdbgsrc\\9d0befca7a43fe4612b645a6c535771b20cf94f7281a7cb9cfa72d2de05ac21b\\ModbusClient.cs [Read Only]",
+              "RelativeToolTip": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\9d0befca7a43fe4612b645a6c535771b20cf94f7281a7cb9cfa72d2de05ac21b\\ModbusClient.cs [Read Only]",
+              "ViewState": "AQIAADwGAAAAAAAAAAAlwEsGAAArAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-18T20:56:54.428Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AQIAAA4AAAAAAAAAAAAQwA8AAAAOAAAA",
+              "ViewState": "AQIAAFgAAAAAAAAAAAAgwHEAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-18T09:11:37.553Z",
+              "WhenOpened": "2024-03-18T18:52:04.949Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ModbusClientTCP.cs",
+              "DocumentMoniker": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\ModbusClientTCP.cs",
+              "RelativeDocumentMoniker": "ModbusClientTCP.cs",
+              "ToolTip": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\ModbusClientTCP.cs",
+              "RelativeToolTip": "ModbusClientTCP.cs",
+              "ViewState": "AQIAAD8AAAAAAAAAAAAywEQAAAAnAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-18T19:14:13.623Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ATHKS.cs",
+              "DocumentMoniker": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\ATHKS.cs",
+              "RelativeDocumentMoniker": "ATHKS.cs",
+              "ToolTip": "C:\\Users\\cansincanberi\\source\\repos\\SAL2\\ATHKS.cs",
+              "RelativeToolTip": "ATHKS.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAArwB0AAAA5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-18T18:32:22.6Z",
               "EditorCaption": ""
             }
           ]

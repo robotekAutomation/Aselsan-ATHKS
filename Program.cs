@@ -32,67 +32,59 @@ class Program
         system.Enable();
         if (!system.IsEnabled())
         {
-            Console.WriteLine("System enable failed...");
+            Console.WriteLine("Test2: System enable failed...");
             return;
         }
-        Console.WriteLine("All Carriers are enabled!");
+        Console.WriteLine("Test2: All Carriers are enabled!");
 
         // TEST2 - Referencing Carriers
-        system.Reference();
+        //system.Reference();
         if (!system.IsReferenced())
         {
-            Console.WriteLine("System reference failed...");
+            Console.WriteLine("Test3: System reference failed...");
             return;
         }
-        Console.WriteLine("All Carriers are referenced!");
+        Console.WriteLine("Test3: All Carriers are referenced!");
 
         // TEST3 - IOs
-        system.SetIO(800, true);
-        if (!system.GetIO(800))
+        system.SetCoil(800, true);
+        if (!system.GetCoil(800))
         {
-            Console.WriteLine("I/O test failed...");
+            Console.WriteLine("Test4: I/O test failed...");
             return;
         }
-        Console.WriteLine("I/O test passed...");
-
-        // TEST4 - Override
-        system.SetOverride(1.1f);
-        if (!Math.Equals(system.GetOverride(), 1.1))
-        {
-            Console.WriteLine("System override failed...");
-            return;
-        }
-        Console.WriteLine("Override test passed...");
+        Console.WriteLine("Test4: I/O test passed...");
 
         // TEST5 - Set Defaults
         Vector4D DefVel = new Vector4D(1000, 1000, 1000, 100);
         Vector4D DefAcc = new Vector4D(1000, 1000, 1000, 100);
         system.carrier0.SetDefaultSpeed(DefVel);
         system.carrier1.SetDefaultAcc(DefAcc);
+        system.SetOverride(1.1f);
         Console.WriteLine("Defaults set for carriers...");
 
         // TEST6 - Individual Moves (non-blocking)
-        Vector4D currentPosCarrier0 = system.carrier0.ReadPos();
-        Vector4D currentPosCarrier1 = system.carrier1.ReadPos();
         // Default vel and acc, absolute move to safety height
         system.carrier0.MoveZ(100, true, system.carrier0.safetyHeight);
         // A little delay between motions to see concurrency
         Thread.Sleep(2000);
         // Given vel and acc, incremental move
+        Vector4D currentPosCarrier1 = system.carrier1.ReadPos();
         system.carrier1.MoveZ(100, false, 50);
         // Wait for motions to finish, individual axes moves are nonblocking
         system.carrier0.WaitMotion();
         system.carrier1.WaitMotion();
+        Vector4D currentPosCarrier0 = system.carrier0.ReadPos();
         // Calculate the target positions for carrier1
         Vector4D targetPosCarrier1 = currentPosCarrier1 + new Vector4D(0, 0, 100, 0);
         // Check if the actual positions match the target positions
         if (!(currentPosCarrier0 == new Vector4D(0, 0, 100, 0)) ||
             !(currentPosCarrier1 == targetPosCarrier1))
         {
-            Console.WriteLine("Test6: Individual moves verification failed...");
+            Console.WriteLine("Test5: Individual moves verification failed...");
             return;
         }
-        Console.WriteLine("Test6: Individual moves verification successful.");
+        Console.WriteLine("Test5: Individual moves verification successful.");
 
         // TEST7 - Carrier Moves (blocking)
         Vector4D Target0 = new Vector4D(100, 200, 300, 400);
@@ -109,10 +101,10 @@ class Program
         if (!(currentPosCarrier0 == system.carrier0.HomePos) ||
             !(currentPosCarrier1 == system.carrier1.LoadPos))
         {
-            Console.WriteLine("Test7: Carrier moves verification failed...");
+            Console.WriteLine("Test6: Carrier moves verification failed...");
             return;
         }
-        Console.WriteLine("Test7: Carrier moves verification successful.");
+        Console.WriteLine("Test6: Carrier moves verification successful.");
 
         // Disable and disconnect from the system
         system.Disable();

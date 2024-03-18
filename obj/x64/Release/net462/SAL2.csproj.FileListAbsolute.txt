@@ -1,0 +1,14 @@
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.csproj.AssemblyReference.cache
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.AssemblyInfoInputs.cache
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.AssemblyInfo.cs
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.csproj.CoreCompileInputs.cache
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.sourcelink.json
+C:\Users\cansincanberi\source\repos\SAL2\bin\x64\Release\net462\SAL2.exe.config
+C:\Users\cansincanberi\source\repos\SAL2\bin\x64\Release\net462\SAL2.exe
+C:\Users\cansincanberi\source\repos\SAL2\bin\x64\Release\net462\SAL2.pdb
+C:\Users\cansincanberi\source\repos\SAL2\bin\x64\Release\net462\EasyModbus.dll
+C:\Users\cansincanberi\source\repos\SAL2\bin\x64\Release\net462\System.IO.Ports.dll
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.csproj.Up2Date
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.exe
+C:\Users\cansincanberi\source\repos\SAL2\obj\x64\Release\net462\SAL2.pdb

@@ -86,24 +86,18 @@ public class ATHKS
     {
         return (carrier0.IsReferenced() && carrier1.IsReferenced() && carrier2.IsReferenced() && carrier3.IsReferenced());
     }
-    //Set ATHKS System is speed override, max 10% change each call for safety
-    //Override=0 will pause the operation
+    //Set ATHKS System is speed override, override=0 will pause the operation
     public void SetOverride(float velOverride)
     {
-        const float tolerance = 0.1f;
-        // Limit the value within +- 10 percentage
-        this.velOverride = Math.Clamp(velOverride, this.velOverride - tolerance, this.velOverride + tolerance);
-        //max override is 2.0
-        this.velOverride = Math.Clamp(this.velOverride, 0.0f, 2.0f);
-        modbusClient.WriteFloat(2050, this.velOverride);
+        modbusClient.WriteFloat(2050, Math.Abs(this.velOverride));
     }
     //Get ATHKS System is speed override
     public float GetOverride()
     {
-        return modbusClient.ReadFloat(2050);
+        return velOverride;
     }
     //Read I0 at given address
-    public bool GetIO(int address)
+    public bool GetCoil(int address)
     {
 
         bool[] values = PLC.ReadCoils(address, 1);
@@ -114,8 +108,19 @@ public class ATHKS
         }
         return false;
     }
+    public bool GetInput(int address)
+    {
+
+        bool[] values = PLC.ReadDiscreteInputs(address, 1);
+
+        if (values.Length > 0)
+        {
+            return values[0];
+        }
+        return false;
+    }
     //Set I0 at given address
-    public void SetIO(int address, bool value)
+    public void SetCoil(int address, bool value)
     {
         PLC.WriteSingleCoil(address, value);
     }
