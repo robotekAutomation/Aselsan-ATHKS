@@ -1,10 +1,10 @@
 ﻿/*
- * ATHKS (Akustik Test Havuzu Konumlandırma Sistemi - Acoustic Test Pool Positioning System) class
+ * ATHKS (Akustik Test Havuzu Konumlandırma Sistemi) class
  * February 2024
  * Creator: Cansın Canberi
  * 
- * This class represents the control system for the Akustik Test Havuzu Konumlandırma Sistemi (ATHKS), which translates to Acoustic Test Pool Positioning System. 
- * It facilitates communication with both PLC and CNC units using Modbus TCP protocol.
+ * This class represents the control system for the Akustik Test Havuzu Konumlandırma Sistemi (ATHKS). 
+ * It facilitates communication with both Robotek PLC and CNC units using Modbus TCP protocol.
  * The class provides methods for connecting to and disconnecting from the system, enabling/disabling the system, referencing the system, 
  * checking system status, setting and getting speed override, and reading/writing I/Os.
  */ 
@@ -68,7 +68,7 @@ public class ATHKS
         carrier2.Disable();
         carrier3.Disable();
     }
-    //Reference the ATHKS System one by one
+    //Reference the ATHKS System
     public void Reference()
     {
         carrier0.Reference();
