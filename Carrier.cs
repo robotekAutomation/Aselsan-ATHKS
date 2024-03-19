@@ -16,10 +16,8 @@ using System.Collections.Generic;
 using System.Linq;
 public class Vector4D
 {
-    // Properties with encapsulation
     public float X, Y, Z, C;
 
-    // Parameterized constructor
     public Vector4D(float x, float y, float z, float c)
     {
         X = x;
@@ -27,8 +25,7 @@ public class Vector4D
         Z = z;
         C = c;
     }
-
-    // Default constructor using the parameterized constructor
+    
     public Vector4D() : this(0, 0, 0, 0) { }
     // Overload the + operator
     public static Vector4D operator +(Vector4D a, Vector4D b)
@@ -200,7 +197,7 @@ public class Carrier
     {
         return DefAcc;
     }
-    //Move Carrier safely
+    //Move Carrier safely with safety height on Z
     public bool SafeMove(Vector4D target, bool abs, Vector4D? vel = null)
     {
         vel ??= DefVel;
@@ -219,7 +216,7 @@ public class Carrier
         Console.WriteLine("Move() completed");
         return true;
     }
-    //Move Carrier, beware Z axis is not in safe 
+    //Move Carrier, beware Z axis is not in safe travel
     public bool Move(Vector4D target, bool abs, Vector4D? vel = null)
     {
         vel ??= DefVel;
