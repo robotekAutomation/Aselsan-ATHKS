@@ -35,7 +35,6 @@ public class ModbusClientTCP
 {
     private ModbusClient modbusClient;
 
-    // Constructor
     public ModbusClientTCP(string ipAddress, int port)
     {
         modbusClient = new ModbusClient(ipAddress, port);
@@ -66,6 +65,8 @@ public class ModbusClientTCP
         modbusClient.WriteSingleRegister(address, value);
         return 0;
     }
+    
+    // Read a floating-point value from the Modbus TCP server in little endian form
     public float ReadFloat(int address)
     {
         int[] registerValues = modbusClient.ReadInputRegisters(address, 2);
@@ -77,7 +78,8 @@ public class ModbusClientTCP
 
         return BitConverter.ToSingle(bytes, 0);
     }
-    // Write a floating-point value to the Modbus TCP server
+    
+    // Write a floating-point value to the Modbus TCP server in little endian form
     public int WriteFloat(int address, float value)
     {
         byte[] bytes = BitConverter.GetBytes(value);
@@ -87,7 +89,7 @@ public class ModbusClientTCP
         modbusClient.WriteMultipleRegisters(address, registerValues);
         return 0;
     }
-
+    
     // Move the motor connected to the specified ID
     public void Move(int ID, float target, float speed, float acc, bool abs)
     {
