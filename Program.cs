@@ -1,5 +1,5 @@
 ﻿/*
- * Functional Test Program for Automated Test Havuzu Konumlandırma Sistemi (ATHKS)
+ * Functional Test Program for Akustik Test Havuzu Konumlandırma Sistemi (ATHKS)
  * February 2024
  * Creator: Cansın Canberi
  * 
