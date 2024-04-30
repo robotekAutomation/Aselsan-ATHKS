@@ -3,14 +3,16 @@
  * February 2024
  * Creator: Cansın Canberi
  * 
- * This class represents the control system for the Akustik Test Havuzu Konumlandırma Sistemi (ATHKS). 
- * It facilitates communication with both Robotek PLC and CNC units using Modbus TCP protocol.
+ * This class represents the control system for the Akustik Test Havuzu Konumlandırma Sistemi (ATHKS).
+ * It facilitates communication with both PLC and CNC units using Modbus TCP protocol.
  * The class provides methods for connecting to and disconnecting from the system, enabling/disabling the system, referencing the system, 
  * checking system status, setting and getting speed override, and reading/writing I/Os.
+ * Controls 4 carries, each with x,y,z and c axes.
  */ 
 
 using EasyModbus;
 using System;
+using System.Threading;
 
 public class ATHKS
 {
@@ -22,7 +24,7 @@ public class ATHKS
     public Carrier carrier3;
     public float velOverride=1;
     //Class constructor with default IPv4, CNC and PLC ports
-    public ATHKS(string IPv4Addr="192.168.0.10", int portCNC=5007, int portPLC=502)
+    public ATHKS(string IPv4Addr="192.168.0.10", int portCNC=1502, int portPLC=502)
     {
         modbusClient = new ModbusClientTCP(IPv4Addr, portCNC);
         PLC = new ModbusClient(IPv4Addr, portPLC);
@@ -52,23 +54,25 @@ public class ATHKS
         modbusClient.Disconnect();
         PLC.Disconnect();
     }
-    //Enable the ATHKS System
+    //Enable the ATHKS System - all carriers
     public void Enable()
     {
         carrier0.Enable();
         carrier1.Enable();
+        Thread.Sleep(1000);
         carrier2.Enable();
         carrier3.Enable();
     }
-    //Disable the ATHKS System
+    //Disable the ATHKS System - all carriers
     public void Disable()
     {
         carrier0.Disable();
         carrier1.Disable();
+        Thread.Sleep(500);
         carrier2.Disable();
         carrier3.Disable();
     }
-    //Reference the ATHKS System
+    //Reference the ATHKS System one by one
     public void Reference()
     {
         carrier0.Reference();
@@ -89,7 +93,7 @@ public class ATHKS
     //Set ATHKS System is speed override, override=0 will pause the operation
     public void SetOverride(float velOverride)
     {
-        modbusClient.WriteFloat(2050, Math.Abs(this.velOverride));
+        modbusClient.SetSpeedOverride(this.velOverride);
     }
     //Get ATHKS System is speed override
     public float GetOverride()

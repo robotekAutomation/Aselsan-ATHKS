@@ -34,7 +34,37 @@ using EasyModbus;
 public class ModbusClientTCP
 {
     private ModbusClient modbusClient;
+    // Modbus Input Registers address
+    private const int GET_POSITION_ADDR = 0;
+    private const int GET_SPEED_ADDR = 600;
+    private const int GET_STATUS_ADDR = 900;
+    private const int GET_SYSTEM_INIT_ADDR = 1000;
+    // Modbus Input Registers control codes 
+    private const int GET_SYSTEM_INIT_CODE_CHECK = 2;
+    private const int GET_STATUS_ENABLE_BIT_OFFSET = 0;
+    private const int GET_STATUS_REFERENCED_BIT_OFFSET = 1;
+    private const int GET_STATUS_ISMOVING_BIT_OFFSET = 2;
 
+    // Modbus Holding Registers address 
+    private const int SET_SYSTEM_INIT_ADDR = 2048;
+    private const int SET_SPEED_OVERRIDE_ADDR = 2050;
+    // For move command
+    private const int SET_TARGET_ADDR = 3000;
+    private const int SET_SPEED_ADDR = 3100;
+    private const int SET_ACCELERATION_ADDR = 3200;
+    private const int SET_COMMAND_ADDR = 3300;
+    // Modbus Holding Registers control codes 
+    private const int SET_SYSTEM_INIT_CODE = 1;
+    private const int SET_COMMAND_CODE_RESET = 0;
+    private const int SET_COMMAND_CODE_INC = 100;
+    private const int SET_COMMAND_CODE_ABS = 101;    
+    private const int SET_COMMAND_CODE_ENABLE = 10;
+    private const int SET_COMMAND_CODE_REFERENCE = 20;
+    private const int SET_COMMAND_CODE_CANCEL = 80;
+    private const int SET_COMMAND_CODE_EMERGENCY_STOP = 90;
+    private const int SET_COMMAND_CODE_DISABLE = 99;
+
+    // Constructor
     public ModbusClientTCP(string ipAddress, int port)
     {
         modbusClient = new ModbusClient(ipAddress, port);
@@ -52,21 +82,20 @@ public class ModbusClientTCP
         modbusClient.Disconnect();
     }
 
-    // Read a single word from the Modbus TCP server
+    // Helper - Read a single word from the Modbus TCP server
     public ushort ReadWord(int address)
     {
         int[] registerValues = modbusClient.ReadInputRegisters(address, 1);
         return (ushort)registerValues[0];
     }
 
-    // Write a single word to the Modbus TCP server
+    // Helper - Write a single word to the Modbus TCP server
     public int WriteWord(int address, int value)
     {
         modbusClient.WriteSingleRegister(address, value);
         return 0;
     }
-    
-    // Read a floating-point value from the Modbus TCP server in little endian form
+    // Helper - Read two modbus words(16+16) from InputRegisters
     public float ReadFloat(int address)
     {
         int[] registerValues = modbusClient.ReadInputRegisters(address, 2);
@@ -78,8 +107,7 @@ public class ModbusClientTCP
 
         return BitConverter.ToSingle(bytes, 0);
     }
-    
-    // Write a floating-point value to the Modbus TCP server in little endian form
+    // Write a floating-point value to the Modbus TCP server
     public int WriteFloat(int address, float value)
     {
         byte[] bytes = BitConverter.GetBytes(value);
@@ -89,81 +117,87 @@ public class ModbusClientTCP
         modbusClient.WriteMultipleRegisters(address, registerValues);
         return 0;
     }
-    
-    // Move the motor connected to the specified ID
+
+    // Move the motor connected to the specified ID 
     public void Move(int ID, float target, float speed, float acc, bool abs)
     {
-        WriteFloat(3000 + ID * 2, target);
-        WriteFloat(3100 + ID * 2, speed);
-        WriteFloat(3200 + ID * 2, acc);
+        WriteFloat(SET_TARGET_ADDR + ID * 2, target);
+        WriteFloat(SET_SPEED_ADDR + ID * 2, speed);
+        WriteFloat(SET_ACCELERATION_ADDR + ID * 2, acc);
         if (abs)
         {
-            WriteWord(3300 + ID, 101);
+            WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_ABS);
         }
         else
         {
-            WriteWord(3300 + ID, 100);
+            WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_INC);
         }
         bool tmp = IsMoving(ID);
-        WriteWord(3300 + ID, 0);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_RESET);
     }
 
     // Check if the motor connected to the specified ID is moving
     public bool IsMoving(int ID)
     {
-        ushort status = ReadWord(900 + ID);
+        ushort status = ReadWord(GET_STATUS_ADDR + ID);
         Thread.Sleep(10); // Prevent excessive usage
-        return GetBit(status, 2) == 0;
+        return GetBit(status, GET_STATUS_ISMOVING_BIT_OFFSET) == 0;
     }
 
     // Enable the motor connected to the specified ID
     public void Enable(int ID)
     {
-        WriteWord(3300 + ID, 10);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_ENABLE);
     }
 
     // Cancel the movement of the motor connected to the specified ID
     public void CancelMove(int ID)
     {
-        WriteWord(3300 + ID, 80);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_CANCEL);
     }
 
     // Stop the motor connected to the specified ID in case of an emergency
     public void EmergencyStop(int ID)
     {
-        WriteWord(3300 + ID, 90);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_EMERGENCY_STOP);
     }
 
     // Check if the motor connected to the specified ID is enabled
     public bool IsEnabled(int ID)
     {
-        ushort status = ReadWord(900 + ID);
+        ushort status = ReadWord(GET_STATUS_ADDR + ID);
         Thread.Sleep(10); // Prevent excessive usage
-        return GetBit(status, 0) == 1;
+        return GetBit(status, GET_STATUS_ENABLE_BIT_OFFSET) == 1;
     }
 
     // Reference the motor connected to the specified ID
     public void Reference(int ID)
     {
-        WriteWord(3300 + ID, 20);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_REFERENCE);
+        Thread.Sleep(500);
     }
 
     // Check if the motor connected to the specified ID is referenced
     public bool IsReferenced(int ID)
     {
-        ushort status = ReadWord(900 + ID);
-        Thread.Sleep(10); // Prevent excessive usage
-        return GetBit(status, 1) == 1;
+        Thread.Sleep(100);
+        ushort status = ReadWord(GET_STATUS_ADDR + ID);
+        return GetBit(status, GET_STATUS_REFERENCED_BIT_OFFSET) == 1;
+    }
+
+    public void SetSpeedOverride(float val)
+    {
+        WriteFloat(SET_SPEED_OVERRIDE_ADDR, Math.Abs(val));
     }
 
     // Initialize the Modbus TCP server
     public void Init()
     {
-        WriteWord(2048, 1);
-        WaitOn(1000, 2);
+        WriteWord(SET_SYSTEM_INIT_ADDR, SET_SYSTEM_INIT_CODE);
+        WaitOn(GET_SYSTEM_INIT_ADDR, GET_SYSTEM_INIT_CODE_CHECK);
     }
 
-    // Wait until the specified address holds the specified value
+    // Helper - Wait until the specified address holds the specified value
     public void WaitOn(int addr, int val)
     {
         while (ReadWord(addr) != val) ;
@@ -172,34 +206,34 @@ public class ModbusClientTCP
     // Disable the motor connected to the specified ID
     public void Disable(int ID)
     {
-        WriteWord(3300 + ID, 99);
+        WriteWord(SET_COMMAND_ADDR + ID, SET_COMMAND_CODE_DISABLE);
     }
 
     // Get the position of the motor connected to the specified ID
     public float GetPos(int ID)
     {
-        return ReadFloat(ID * 2);
+        return ReadFloat(GET_POSITION_ADDR + ID * 2);
     }
 
     // Get the velocity of the motor connected to the specified ID
     public float GetVel(int ID)
     {
-        return ReadFloat(600 + ID * 2);
+        return ReadFloat(GET_SPEED_ADDR + ID * 2);
     }
 
     // Get the status of the motor connected to the specified ID
     public int GetStatus(int ID)
     {
-        return ReadWord(900 + ID);
+        return ReadWord(GET_STATUS_ADDR + ID);
     }
 
-    // Get the value of a specific bit in a word
+    // Helper-Get the value of a specific bit in a word
     private int GetBit(ushort word, int bitPosition)
     {
         return (word >> bitPosition) & 1;
     }
 
-    // Convert two words to a floating-point value
+    // Helper-Convert two words to a floating-point value
     private float WordArrayToFloat(ushort highOrderValue, ushort lowOrderValue)
     {
         byte[] bytes = new byte[4];

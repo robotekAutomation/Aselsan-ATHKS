@@ -16,8 +16,10 @@ using System.Collections.Generic;
 using System.Linq;
 public class Vector4D
 {
+    // Properties with encapsulation
     public float X, Y, Z, C;
 
+    // Parameterized constructor
     public Vector4D(float x, float y, float z, float c)
     {
         X = x;
@@ -25,7 +27,8 @@ public class Vector4D
         Z = z;
         C = c;
     }
-    
+
+    // Default constructor using the parameterized constructor
     public Vector4D() : this(0, 0, 0, 0) { }
     // Overload the + operator
     public static Vector4D operator +(Vector4D a, Vector4D b)
@@ -59,7 +62,6 @@ public class Vector4D
                 Math.Equals(left.Z, right.Z) &&
                 Math.Equals(left.C, right.C);
     }
-
     // Overload the != operator
     public static bool operator !=(Vector4D left, Vector4D right)
     {
@@ -81,6 +83,7 @@ public class Carrier
 {
     private ModbusClientTCP client;
     private int xID, yID, zID, cID;
+    Dictionary<char, int> idDict = new Dictionary<char, int>();
     public Carrier(ModbusClientTCP client, int xID, int yID, int zID, int cID)
     {
         this.client = client;
@@ -96,6 +99,10 @@ public class Carrier
         HomePos = new Vector4D(0, 0, 0, 0);         
         LoadPos = new Vector4D(100, 0, 0, 0);
         safetyHeight = 1000;
+        idDict['x'] = xID;
+        idDict['y'] = yID;
+        idDict['z'] = zID;
+        idDict['c'] = cID;
     }
     public Vector4D AccLimits;
     public Vector4D VelLimits;
@@ -123,7 +130,15 @@ public class Carrier
         float c = client.GetVel(cID);
         return new Vector4D(x, y, z, c);
     }
-    //Enable the Carrier
+    //Enable an individual Carrier axis (x,y,z or c)
+    public void Enable(char ID)
+    {
+        if (idDict.ContainsKey(ID)){
+            client.Enable(idDict[ID]);
+            while (!client.IsEnabled(idDict[ID]));
+        }
+    }
+    //Enable all carrier axes
     public void Enable()
     {
         client.Enable(xID);
@@ -131,6 +146,14 @@ public class Carrier
         client.Enable(zID);
         client.Enable(cID);
         while (!client.IsEnabled(xID) || !client.IsEnabled(yID) || !client.IsEnabled(zID) || !client.IsEnabled(cID)) ;
+    }
+    //Disable an individual Carrier axis (x,y,z or c)
+    public void Disable(char ID)
+    {
+        if (idDict.ContainsKey(ID)){
+            client.Disable(idDict[ID]);
+            while (client.IsEnabled(idDict[ID])) ;
+        }
     }
     //Disable the Carrier
     public void Disable()
@@ -141,19 +164,28 @@ public class Carrier
         client.Disable(cID);
         while (client.IsEnabled(xID) || client.IsEnabled(yID) || client.IsEnabled(zID) || client.IsEnabled(cID)) ;
     }
-    //Reference the Carrier
+    //Reference the Carrier (order: z,x,y,c)
     public void Reference()
     {
         Console.WriteLine($"Referencing the system!");
         client.Reference(zID);
-        while (client.IsReferenced(zID));
+        //while (client.IsReferenced(zID));
         Console.WriteLine($"Z referenced!");
         //blocking
         client.Reference(xID);
         client.Reference(yID);
         client.Reference(cID);
-        while (client.IsReferenced(xID) || client.IsReferenced(yID) || client.IsReferenced(cID));
+        //while (client.IsReferenced(xID) || client.IsReferenced(yID) || client.IsReferenced(cID));
         Console.WriteLine($"X,Y,C referenced!");
+    }
+    //Reference an individual Carrier axis (x,y,z or c)
+    public void Reference(char ID)
+    {
+        if (idDict.ContainsKey(ID))
+        {
+            client.Reference(idDict[ID]);
+            while (client.IsReferenced(idDict[ID])) ;
+        }
     }
     //Check if Enabled
     public bool IsEnabled()
@@ -197,7 +229,7 @@ public class Carrier
     {
         return DefAcc;
     }
-    //Move Carrier safely with safety height on Z
+    //Move Carrier safely (first Z axis to safety height)
     public bool SafeMove(Vector4D target, bool abs, Vector4D? vel = null)
     {
         vel ??= DefVel;
@@ -216,7 +248,7 @@ public class Carrier
         Console.WriteLine("Move() completed");
         return true;
     }
-    //Move Carrier, beware Z axis is not in safe travel
+    //Move Carrier, beware Z axis is not in safe 
     public bool Move(Vector4D target, bool abs, Vector4D? vel = null)
     {
         vel ??= DefVel;
@@ -227,6 +259,17 @@ public class Carrier
         MoveC(target.Z, true, vel.Z);
         WaitMotion();
         Console.WriteLine("Move() completed");
+        return true;
+    }
+    //Move Carrier beware Z axis is not in safe, return without waiting for finish
+    public bool UMove(Vector4D target, bool abs, Vector4D? vel = null)
+    {
+        vel ??= DefVel;
+        Console.WriteLine($"Move() called with target: ({target.X}, {target.Y}, {target.Z}, {target.C}), abs: {abs}, vel: {vel}");
+        MoveX(target.X, true, vel.X);
+        MoveY(target.Y, true, vel.Y);
+        MoveC(target.C, true, vel.C);
+        MoveC(target.Z, true, vel.Z);
         return true;
     }
     //Move Carrier X Axis
@@ -260,6 +303,42 @@ public class Carrier
         acc ??= DefAcc?.C ?? 0;
         Console.WriteLine($"MoveC() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
         client.Move(cID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+    }
+    //Move Carrier X Axis, return without waiting for finish
+    public void UMoveX(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.X ?? 0; // Assign 0 if DefVel or DefVel.X is null
+        acc ??= DefAcc?.X ?? 0; // Assign 0 if DefAcc or DefAcc.X is null
+        Console.WriteLine($"MoveX() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(xID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(xID)) ;
+    }
+    //Move Carrier Y Axis, return without waiting for finish
+    public void UMoveY(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.Y ?? 0;
+        acc ??= DefAcc?.Y ?? 0;
+        Console.WriteLine($"MoveY() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(yID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(yID)) ;
+    }
+    //Move Carrier Z Axis, return without waiting for finish
+    public void UMoveZ(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.Z ?? 0;
+        acc ??= DefAcc?.Z ?? 0;
+        Console.WriteLine($"MoveZ() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(zID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(zID)) ;
+    }
+    //Move Carrier C Axis, return without waiting for finish
+    public void UMoveC(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.C ?? 0;
+        acc ??= DefAcc?.C ?? 0;
+        Console.WriteLine($"MoveC() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(cID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(cID)) ;
     }
     //Wait for current motion to finish
     public void WaitMotion()
