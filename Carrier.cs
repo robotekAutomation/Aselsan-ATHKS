@@ -169,13 +169,11 @@ public class Carrier
     {
         Console.WriteLine($"Referencing the system!");
         client.Reference(zID);
-        //while (client.IsReferenced(zID));
         Console.WriteLine($"Z referenced!");
         //blocking
         client.Reference(xID);
         client.Reference(yID);
         client.Reference(cID);
-        //while (client.IsReferenced(xID) || client.IsReferenced(yID) || client.IsReferenced(cID));
         Console.WriteLine($"X,Y,C referenced!");
     }
     //Reference an individual Carrier axis (x,y,z or c)
@@ -235,16 +233,11 @@ public class Carrier
         vel ??= DefVel;
         Console.WriteLine($"SafeMove() called with target: ({target.X}, {target.Y}, {target.Z}, {target.C}), abs: {abs}, vel: {vel}");
         MoveZ(safetyHeight, true, vel.Z);
-        //blocking-pool
-        while (client.IsMoving(zID));
-        //blocking
-        MoveX(target.X, true, vel.X);
-        MoveY(target.Y, true, vel.Y);
-        MoveC(target.C, true, vel.C);
-        while (client.IsMoving(xID) || client.IsMoving(yID) || client.IsMoving(cID));
-        //blocking
+        UMoveX(target.X, true, vel.X);
+        UMoveY(target.Y, true, vel.Y);
+        UMoveC(target.C, true, vel.C);
+        WaitMotion();
         MoveZ(target.Z, true, vel.Z);
-        while (client.IsMoving(zID));
         Console.WriteLine("Move() completed");
         return true;
     }
@@ -253,10 +246,10 @@ public class Carrier
     {
         vel ??= DefVel;
         Console.WriteLine($"Move() called with target: ({target.X}, {target.Y}, {target.Z}, {target.C}), abs: {abs}, vel: {vel}");
-        MoveX(target.X, true, vel.X);
-        MoveY(target.Y, true, vel.Y);
-        MoveC(target.C, true, vel.C);
-        MoveC(target.Z, true, vel.Z);
+        UMoveX(target.X, true, vel.X);
+        UMoveY(target.Y, true, vel.Y);
+        UMoveZ(target.Z, true, vel.Z);
+        UMoveC(target.C, true, vel.C);
         WaitMotion();
         Console.WriteLine("Move() completed");
         return true;
@@ -265,44 +258,12 @@ public class Carrier
     public bool UMove(Vector4D target, bool abs, Vector4D? vel = null)
     {
         vel ??= DefVel;
-        Console.WriteLine($"Move() called with target: ({target.X}, {target.Y}, {target.Z}, {target.C}), abs: {abs}, vel: {vel}");
-        MoveX(target.X, true, vel.X);
-        MoveY(target.Y, true, vel.Y);
-        MoveC(target.C, true, vel.C);
-        MoveC(target.Z, true, vel.Z);
+        Console.WriteLine($"UMove() called with target: ({target.X}, {target.Y}, {target.Z}, {target.C}), abs: {abs}, vel: {vel}");
+        UMoveX(target.X, true, vel.X);
+        UMoveY(target.Y, true, vel.Y);
+        UMoveZ(target.Z, true, vel.Z);
+        UMoveC(target.C, true, vel.C);
         return true;
-    }
-    //Move Carrier X Axis
-    public void MoveX(float dest, bool abs, float? vel = null, float? acc = null)
-    {
-        vel ??= DefVel?.X ?? 0; // Assign 0 if DefVel or DefVel.X is null
-        acc ??= DefAcc?.X ?? 0; // Assign 0 if DefAcc or DefAcc.X is null
-        Console.WriteLine($"MoveX() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
-        client.Move(xID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-    }
-    //Move Carrier Y Axis
-    public void MoveY(float dest, bool abs, float? vel = null, float? acc = null)
-    {
-        vel ??= DefVel?.Y ?? 0;
-        acc ??= DefAcc?.Y ?? 0;
-        Console.WriteLine($"MoveY() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
-        client.Move(yID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-    }
-    //Move Carrier Z Axis
-    public void MoveZ(float dest, bool abs, float? vel = null, float? acc = null)
-    {
-        vel ??= DefVel?.Z ?? 0;
-        acc ??= DefAcc?.Z ?? 0;
-        Console.WriteLine($"MoveZ() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
-        client.Move(zID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-    }
-    //Move Carrier C Axis
-    public void MoveC(float dest, bool abs, float? vel = null, float? acc = null)
-    {
-        vel ??= DefVel?.C ?? 0;
-        acc ??= DefAcc?.C ?? 0;
-        Console.WriteLine($"MoveC() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
-        client.Move(cID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
     }
     //Move Carrier X Axis, return without waiting for finish
     public void UMoveX(float dest, bool abs, float? vel = null, float? acc = null)
@@ -311,7 +272,6 @@ public class Carrier
         acc ??= DefAcc?.X ?? 0; // Assign 0 if DefAcc or DefAcc.X is null
         Console.WriteLine($"MoveX() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
         client.Move(xID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-        while (client.IsMoving(xID)) ;
     }
     //Move Carrier Y Axis, return without waiting for finish
     public void UMoveY(float dest, bool abs, float? vel = null, float? acc = null)
@@ -320,7 +280,6 @@ public class Carrier
         acc ??= DefAcc?.Y ?? 0;
         Console.WriteLine($"MoveY() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
         client.Move(yID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-        while (client.IsMoving(yID)) ;
     }
     //Move Carrier Z Axis, return without waiting for finish
     public void UMoveZ(float dest, bool abs, float? vel = null, float? acc = null)
@@ -329,10 +288,44 @@ public class Carrier
         acc ??= DefAcc?.Z ?? 0;
         Console.WriteLine($"MoveZ() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
         client.Move(zID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
-        while (client.IsMoving(zID)) ;
     }
     //Move Carrier C Axis, return without waiting for finish
     public void UMoveC(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.C ?? 0;
+        acc ??= DefAcc?.C ?? 0;
+        Console.WriteLine($"MoveC() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(cID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+    }
+    //Move Carrier X Axis
+    public void MoveX(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.X ?? 0; // Assign 0 if DefVel or DefVel.X is null
+        acc ??= DefAcc?.X ?? 0; // Assign 0 if DefAcc or DefAcc.X is null
+        Console.WriteLine($"MoveX() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(xID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(xID)) ;
+    }
+    //Move Carrier Y Axis
+    public void MoveY(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.Y ?? 0;
+        acc ??= DefAcc?.Y ?? 0;
+        Console.WriteLine($"MoveY() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(yID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(yID)) ;
+    }
+    //Move Carrier Z Axis
+    public void MoveZ(float dest, bool abs, float? vel = null, float? acc = null)
+    {
+        vel ??= DefVel?.Z ?? 0;
+        acc ??= DefAcc?.Z ?? 0;
+        Console.WriteLine($"MoveZ() called with dest: {dest}, abs: {abs}, vel: {vel}, acc: {acc}");
+        client.Move(zID, dest, vel.GetValueOrDefault(), acc.GetValueOrDefault(), abs);
+        while (client.IsMoving(zID)) ;
+    }
+    //Move Carrier C Axis
+    public void MoveC(float dest, bool abs, float? vel = null, float? acc = null)
     {
         vel ??= DefVel?.C ?? 0;
         acc ??= DefAcc?.C ?? 0;

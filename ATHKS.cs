@@ -100,6 +100,53 @@ public class ATHKS
     {
         return velOverride;
     }
+    //Read System Messages
+    public enum SystemMessage
+    {
+        Invalid = -1, // When data isn't as expected
+        PressReady,   // Red LED active but no buzzer
+        ServoError,   // Red LED and buzzer active
+        SystemReadyToMove,  // Yellow (orange) LED active
+        SystemMoveActive  // Green LED active
+    }
+    //Read Status
+    public SystemMessage GetSystemMessage()
+    {
+
+        bool[] values = PLC.ReadCoils(806, 4);
+
+        if (values.Length != 4)
+        {
+            return SystemMessage.Invalid;
+        }
+
+        // Assign variables for each LED and buzzer
+        bool redLed = values[0];
+        bool orangeLed = values[1];
+        bool greenLed = values[2];
+        bool buzzer = values[3];
+
+        // Determine the correct system message based on the conditions
+        if (redLed && !buzzer)
+        {
+            return SystemMessage.PressReady;
+        }
+        else if (redLed && buzzer)
+        {
+            return SystemMessage.ServoError;
+        }
+        else if (orangeLed)
+        {
+            return SystemMessage.SystemReadyToMove;
+        }
+        else if (greenLed)
+        {
+            return SystemMessage.SystemMoveActive;
+        }
+
+        // If none of the above conditions are met, return Invalid
+        return SystemMessage.Invalid;
+    }
     //Read I0 at given address
     public bool GetCoil(int address)
     {
