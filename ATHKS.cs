@@ -106,8 +106,8 @@ public class ATHKS
         Invalid = -1, // When data isn't as expected
         PressReady,   // Red LED active but no buzzer
         ServoError,   // Red LED and buzzer active
-        SystemReadyToMove,  // Yellow (orange) LED active
-        SystemMoveActive  // Green LED active
+        ReadyToMove,  // Yellow (orange) LED active
+        MoveActive  // Green LED active
     }
     //Read Status
     public SystemMessage GetSystemMessage()
@@ -137,11 +137,11 @@ public class ATHKS
         }
         else if (orangeLed)
         {
-            return SystemMessage.SystemReadyToMove;
+            return SystemMessage.ReadyToMove;
         }
         else if (greenLed)
         {
-            return SystemMessage.SystemMoveActive;
+            return SystemMessage.MoveActive;
         }
 
         // If none of the above conditions are met, return Invalid

@@ -68,17 +68,7 @@ public class Vector4D
         return !(left==right);
     }
 }
-enum UyariMesajlari
-{
-    SORUN_YOK,
-    ACIL_AKTIF,
-    ARTI_LIMIT_AKTIF,
-    EKSI_LIMIT_AKTIF,
-    FOLLOW_ERROR,
-    HEDEF_HIZ_SINIR_DISINDA,
-    HEDEF_KONUM_SINIR_DISINDA
-    //add more
-}
+
 public class Carrier
 {
     private ModbusClientTCP client;
