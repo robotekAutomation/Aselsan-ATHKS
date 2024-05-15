@@ -28,10 +28,10 @@ public class ATHKS
     {
         modbusClient = new ModbusClientTCP(IPv4Addr, portCNC);
         PLC = new ModbusClient(IPv4Addr, portPLC);
-        carrier0 = new Carrier(modbusClient, 0, 1, 2, 3);
-        carrier1 = new Carrier(modbusClient, 0, 4, 5, 6);
-        carrier2 = new Carrier(modbusClient, 7, 8, 9, 10);
-        carrier3 = new Carrier(modbusClient, 7, 11, 12, 13);
+        carrier0 = new Carrier(modbusClient, 0, 1, 3, 2);
+        carrier1 = new Carrier(modbusClient, 0, 4, 6, 5);
+        carrier2 = new Carrier(modbusClient, 7, 8, 10, 9);
+        carrier3 = new Carrier(modbusClient, 7, 11, 13, 12);
     }
     //Connect to the ATHKS System, both PLC and CNC units
     public bool Connect()
